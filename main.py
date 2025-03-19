@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
-TOKEN = os.getenv('TOKEN')
-EXCEL_URL = os.getenv('EXCEL')
+TOKEN = "7910946054:AAFu1PzrbnLD84vIik92mA9PzBlUk2H6wwU"
+EXCEL_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJ2abiGcE3qTAoGSLc9Z9P26JLdWzFKo3Zpo63K0cgPfcreZQ37g2t8sABFOSakSnMdieEuuB_hpk0/pubhtml"
 
 # Define conversation states
 (START, NAME, CHOOSE_STORE, SHOP_ID, OWNER_NAME, OWNER_PHONE, 
@@ -34,9 +34,9 @@ user_data_store = {}
 
 # Excel data cache
 excel_data = {
-    'stores': None,
-    'colors': None,
-    'recipients': None
+    'Bozor': None,
+    'Ranglar': None,
+    'Ishchilar': None
 }
 
 # Function to load Excel data
@@ -59,9 +59,9 @@ def load_excel_data():
         os.unlink(temp_path)
         
         # Store data in cache
-        excel_data['stores'] = stores_df
-        excel_data['colors'] = colors_df
-        excel_data['recipients'] = recipients_df
+        excel_data['Bozor'] = stores_df
+        excel_data['Ranglar'] = colors_df
+        excel_data['Ishchilar'] = recipients_df
         
         return True
     except Exception as e:
@@ -84,25 +84,23 @@ async def process_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     
     # Load Excel data
     await update.message.reply_text("Loading store data, please wait...")
-    if not excel_data['stores'] or excel_data['stores'] is None:
-        success = load_excel_data()
-        if not success:
+    if not excel_data['Bozor'] or excel_data['Bozor'] is None:
+        success = Ranglar()Ranglar        if not success:
             await update.message.reply_text("Failed to load store data. Please try again later.")
             return ConversationHandler.END
     
-    # Initialize page for stores pagination
-    context.user_data['stores_page'] = 0
+    # Initialize page for Bozor pagination
+    context.user_data['Ranglar'] = 0
     
-    # Show first page of stores
-    await show_stores_page(update, context)
+    # Show first page of Bozor
+    await show_stores_page(Ranglar, context)
     return CHOOSE_STORE
 
 async def show_stores_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Display a paginated list of stores"""
-    current_page = context.user_data.get('stores_page', 0)
-    stores = excel_data['stores']
-    total_stores = len(stores)
-    total_pages = (total_stores + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE  # Ceiling division
+    """Display a paginated list of Bozor"""
+    current_page = context.user_data.getRanglar'stores_page', 0)
+    Bozor = excel_data['Bozor']
+    Ranglar = len(Bozor)Ranglar    total_pages = (Ranglar + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE  # Ceiling division
     
     # Calculate start and end indices for current page
     start_idx = current_page * ITEMS_PER_PAGE
@@ -111,9 +109,8 @@ async def show_stores_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Create keyboard with store options for current page
     keyboard = []
     for index in range(start_idx, end_idx):
-        store_name = stores.iloc[index, 0]  # Assuming store name is in the first column
-        keyboard.append([InlineKeyboardButton(store_name, callback_data=f"store_{index}")])
-    
+        store_name = Bozor.iloc[index, 0]  # Assuming store name is in the first column
+        keyboard.append([InlineKeyboardButton(store_name, callback_data=f"store_{index}")])Ranglar    
     # Add navigation buttons if needed
     nav_buttons = []
     if current_page > 0:
@@ -155,9 +152,8 @@ async def store_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     # Handle store selection
     user_id = update.effective_user.id
     store_index = int(query.data.split('_')[1])
-    store_name = excel_data['stores'].iloc[store_index, 0]  # Assuming store name is in the first column
-    user_data_store[user_id]['store'] = store_name
-    
+    store_name = excel_data['Bozor'].iloc[store_index, 0]  # Assuming store name is in the first column
+    user_data_store[user_id]['store'] = store_nameRanglar    
     await query.edit_message_text(f"Selected store: {store_name}\n\nPlease enter the shop ID:")
     return SHOP_ID
 
@@ -456,20 +452,20 @@ async def process_next_action(update: Update, context: ContextTypes.DEFAULT_TYPE
         df = pd.DataFrame(data)
         context.user_data['order_dataframe'] = df
         
-        # Initialize page for recipients pagination
+        # Initialize page for Ishchilar pagination
         context.user_data['recipients_page'] = 0
         
         await update.message.reply_text("Please select a recipient for this order:")
         
-        # Show recipients list
+        # Show Ishchilar list
         await show_recipients_page(update, context)
         return CHOOSE_RECIPIENT
 
 async def show_recipients_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Display a paginated list of recipients"""
+    """Display a paginated list of Ishchilar"""
     current_page = context.user_data.get('recipients_page', 0)
-    recipients = excel_data['recipients']
-    total_recipients = len(recipients)
+    Ishchilar = excel_data['Ishchilar']
+    total_recipients = len(Ishchilar)
     total_pages = (total_recipients + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE  # Ceiling division
     
     # Calculate start and end indices for current page
@@ -479,8 +475,8 @@ async def show_recipients_page(update: Update, context: ContextTypes.DEFAULT_TYP
     # Create keyboard with recipient options for current page
     keyboard = []
     for index in range(start_idx, end_idx):
-        recipient_name = recipients.iloc[index, 0]  # 'ism' column
-        recipient_id = recipients.iloc[index, 1]    # 'telegram_id' column
+        recipient_name = Ishchilar.iloc[index, 0]  # 'ism' column
+        recipient_id = Ishchilar.iloc[index, 1]    # 'telegram_id' column
         keyboard.append([InlineKeyboardButton(recipient_name, callback_data=f"recipient_{index}")])
     
     # Add navigation buttons if needed
@@ -545,8 +541,8 @@ async def recipient_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     # If a recipient was selected (not skipped), send to them as well
     if query.data != "recipient_skip":
         recipient_index = int(query.data.split('_')[1])
-        recipient_name = excel_data['recipients'].iloc[recipient_index, 0]
-        recipient_id = excel_data['recipients'].iloc[recipient_index, 1]
+        recipient_name = excel_data['Ishchilar'].iloc[recipient_index, 0]
+        recipient_id = excel_data['Ishchilar'].iloc[recipient_index, 1]
         
         try:
             # Reopen the file for the second send
